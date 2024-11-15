@@ -1,0 +1,110 @@
+substitutions:
+  name: hdmi-control-palakis
+  friendly_name: "HDMI Control - palakis"
+
+esphome:
+  name: "${name}"
+  friendly_name: "${friendly_name}"
+#  platformio_options:
+#    board_buid.f_cpu: 160000000L
+  name_add_mac_suffix: true
+  project:
+    name: SMLIGHT.SLWF-08-HDMI
+    version: "1.0-Palakis"
+  platform: ESP8266
+  board: esp12e
+
+wifi:
+  ssid: "SSID-name"
+  password: "password"
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "HDMI-AP"
+    password: "slwf08"
+
+captive_portal:
+
+# Enable Home Assistant API
+api:
+  services:
+    - service: hdmi_cec_send
+      variables:
+        cec_destination: int
+        cec_data: int[]
+      then:
+        - hdmi_cec.send:
+            destination: !lambda "return static_cast<unsigned char>(cec_destination);"
+            data: !lambda "std::vector<unsigned char> charVector; for (int i : cec_data) { charVector.push_back(static_cast<unsigned char>(i)); } return charVector;"
+
+ota:
+  - platform: esphome
+
+web_server:
+  port: 80
+
+# Enable logging
+logger:
+
+external_components:
+#  - source: github://johnboiles/esphome-hdmi-cec
+  - source: github://Palakis/esphome-hdmi-cec
+
+dashboard_import:
+  package_import_url: github://smlight-tech/slwf-08/esphome-configs/slwf-08-Palakis.yaml
+
+hdmi_cec:
+  pin: GPIO14
+  address: 0x05
+  physical_address: 0x1000
+  osd_name: "SLWF-08-HDMI" # Optional. Defaults to "esphome"  
+  promiscuous_mode: false # Optional. Defaults to false  
+  monitor_mode: false # Optional. Defaults to false  
+  on_message:
+    - opcode: 0x36 # opcode for "Standby"
+      then:
+        logger.log: "Got Standby command"
+        # Respond to "Menu Request" (not required, example purposes only)
+    - opcode: 0x8D
+      then:
+        hdmi_cec.send:
+          # both "destination" and "data" are templatable
+          destination: !lambda return source;
+          data: [0x8E, 0x01] # 0x01 => "Menu Deactivated" 
+
+button:
+  - platform: template
+    name: "Turn everything on"
+    on_press:
+      - hdmi_cec.send:
+          destination: 0xF # or 0xF for Broadcast
+          data: [0x04] # "Image View on
+  - platform: template
+    name: "Turn everything off"
+    on_press:
+      - hdmi_cec.send:
+          destination: 0xF
+          data: [0x36] # "Standby" opcode
+  - platform: template
+    name: "Turn active source"
+    on_press:
+      - hdmi_cec.send:
+          destination: 0xF # Broadcast
+          data: [0x82] # "Power on" opcode
+  - platform: template
+    name: "Mute"
+    on_press:
+      - hdmi_cec.send:
+          destination: 0xF # Broadcast
+          data: [0x43] # "Mute" opcode          
+  - platform: template
+    name: "Volume Down"
+    on_press:
+      - hdmi_cec.send:
+          destination: 0xF # Broadcast
+          data: [0x42] # "Volume Down" opcode                   
+  - platform: template
+    name: "Volume up"
+    on_press:
+      - hdmi_cec.send:
+          destination: 0xF # Broadcast
+          data: [0x41] # "Volume up" opcode   
