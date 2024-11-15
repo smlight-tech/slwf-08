@@ -41,7 +41,7 @@ external_components:
   # - source: github://Palakis/esphome-hdmi-cec
 
 dashboard_import:
-  package_import_url: github://smlight-tech/slwf-08/esphome-configs/slzb-08-johnboiles.yaml
+  package_import_url: github://smlight-tech/slwf-08/esphome-configs/slwf-08-johnboiles.yaml
 
 hdmi_cec:
   pin: GPIO14
