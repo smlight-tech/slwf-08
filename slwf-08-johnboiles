@@ -1,0 +1,89 @@
+substitutions:
+  name: hdmi-control
+  friendly_name: "HDMI Control"
+
+esphome:
+  name: "${name}"
+  friendly_name: "${friendly_name}"
+#  platformio_options:
+#    board_buid.f_cpu: 160000000L
+  name_add_mac_suffix: true
+  project:
+    name: SMLIGHT.SLWF-08-HDMI
+    version: "1.0"
+  platform: ESP8266
+  board: esp12e
+
+wifi:
+  ssid: "SSID-name"
+  password: "password"
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "HDMI-AP"
+    password: "slwf08"
+
+captive_portal:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  - platform: esphome
+
+#web_server:
+#  port: 80
+
+# Enable logging
+logger:
+
+external_components:
+  - source: github://johnboiles/esphome-hdmi-cec
+  # - source: github://Palakis/esphome-hdmi-cec
+
+dashboard_import:
+  package_import_url: github://smlight-tech/slwf-08/esphome-configs/slzb-08-johnboiles.yaml
+
+hdmi_cec:
+  pin: GPIO14
+  address: 0x04
+  physical_address: 0x1000
+
+    
+
+button:
+  - platform: template
+    name: "Turn everything on"
+    on_press:
+      - hdmi_cec.send:
+          destination: 0xF # or 0xF for Broadcast
+          data: [0x04] # "Image View on
+  - platform: template
+    name: "Turn everything off"
+    on_press:
+      - hdmi_cec.send:
+          destination: 0xF
+          data: [0x36] # "Standby" opcode
+  - platform: template
+    name: "Turn active source"
+    on_press:
+      - hdmi_cec.send:
+          destination: 0xF # Broadcast
+          data: [0x82] # "Power on" opcode
+  - platform: template
+    name: "Mute"
+    on_press:
+      - hdmi_cec.send:
+          destination: 0xF # Broadcast
+          data: [0x43] # "Mute" opcode          
+  - platform: template
+    name: "Volume Down"
+    on_press:
+      - hdmi_cec.send:
+          destination: 0xF # Broadcast
+          data: [0x42] # "Volume Down" opcode                   
+  - platform: template
+    name: "Volume up"
+    on_press:
+      - hdmi_cec.send:
+          destination: 0xF # Broadcast
+          data: [0x41] # "Volume up" opcode   
