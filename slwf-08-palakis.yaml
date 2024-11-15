@@ -55,7 +55,7 @@ dashboard_import:
 hdmi_cec:
   pin: GPIO14
   address: 0x05
-  physical_address: 0x1000
+  physical_address: 0x4000
   osd_name: "SLWF-08-HDMI" # Optional. Defaults to "esphome"  
   promiscuous_mode: false # Optional. Defaults to false  
   monitor_mode: false # Optional. Defaults to false  
