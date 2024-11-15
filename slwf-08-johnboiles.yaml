@@ -45,8 +45,8 @@ dashboard_import:
 
 hdmi_cec:
   pin: GPIO14
-  address: 0x04
-  physical_address: 0x1000
+  address: 0x05
+  physical_address: 0x4000
 
     
 
