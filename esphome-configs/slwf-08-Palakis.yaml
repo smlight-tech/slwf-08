@@ -1,17 +1,18 @@
 substitutions:
-  name: hdmi-control-palakis
+  name: "hdmi-control-palakis"
   friendly_name: "HDMI Control - palakis"
+  project_name: "SMLIGHT.SLWF-08-HDMI"
+  project_version: "1.0-Palakis"
 
 esphome:
   name: "${name}"
   friendly_name: "${friendly_name}"
-#  platformio_options:
-#    board_buid.f_cpu: 160000000L
   name_add_mac_suffix: true
   project:
-    name: SMLIGHT.SLWF-08-HDMI
-    version: "1.0-Palakis"
-  platform: ESP8266
+    name: "${project_name}"
+    version: "${project_version}"
+
+esp8266:
   board: esp12e
 
 wifi:
